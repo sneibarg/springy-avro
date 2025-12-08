@@ -1,0 +1,168 @@
+{
+  "type": "record",
+  "name": "LoanApplication",
+  "namespace": "org.springy.springy_avro.example.loans",
+  "doc": "Top-level loan application with polymorphic details.",
+  "fields": [
+    {
+      "name": "applicationId",
+      "type": "string"
+    },
+    {
+      "name": "createdAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "loanType",
+      "type": {
+        "type": "enum",
+        "name": "LoanType",
+        "symbols": [
+          "AUTO",
+          "MORTGAGE"
+        ]
+      }
+    },
+    {
+      "name": "requestedAmount",
+      "type": "double"
+    },
+    {
+      "name": "termMonths",
+      "type": "int"
+    },
+    {
+      "name": "applicant",
+      "type": {
+        "type": "record",
+        "name": "Applicant",
+        "fields": [
+          { "name": "applicantId", "type": "string" },
+          { "name": "firstName",   "type": "string" },
+          { "name": "lastName",    "type": "string" },
+          {
+            "name": "dateOfBirth",
+            "type": {
+              "type": "int",
+              "logicalType": "date"
+            }
+          },
+          { "name": "email",        "type": ["null", "string"], "default": null },
+          { "name": "phoneNumber",  "type": ["null", "string"], "default": null },
+          { "name": "annualIncome", "type": "double" },
+          {
+            "name": "employmentStatus",
+            "type": {
+              "type": "enum",
+              "name": "EmploymentStatus",
+              "symbols": [
+                "EMPLOYED",
+                "SELF_EMPLOYED",
+                "UNEMPLOYED",
+                "RETIRED",
+                "STUDENT"
+              ]
+            }
+          },
+          { "name": "creditScore", "type": ["null", "int"], "default": null },
+          {
+            "name": "currentAddress",
+            "type": [
+              "null",
+              {
+                "type": "record",
+                "name": "Address",
+                "fields": [
+                  { "name": "line1",      "type": "string" },
+                  { "name": "line2",      "type": ["null", "string"], "default": null },
+                  { "name": "city",       "type": "string" },
+                  { "name": "state",      "type": "string" },
+                  { "name": "postalCode", "type": "string" },
+                  { "name": "country",    "type": "string", "default": "US" }
+                ]
+              }
+            ],
+            "default": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "details",
+      "doc": "Type-specific loan details; matches loanType.",
+      "type": [
+        {
+          "type": "record",
+          "name": "AutoLoanDetails",
+          "fields": [
+            { "name": "vehicleVin",   "type": "string" },
+            { "name": "make",         "type": "string" },
+            { "name": "model",        "type": "string" },
+            { "name": "modelYear",    "type": "int" },
+            { "name": "purchasePrice","type": "double" },
+            { "name": "downPayment",  "type": "double", "default": 0.0 },
+            {
+              "name": "dealerName",
+              "type": ["null", "string"],
+              "default": null
+            },
+            {
+              "name": "newOrUsed",
+              "type": {
+                "type": "enum",
+                "name": "VehicleCondition",
+                "symbols": ["NEW", "USED"]
+              }
+            }
+          ]
+        },
+        {
+          "type": "record",
+          "name": "MortgageLoanDetails",
+          "fields": [
+            {
+              "name": "propertyAddress",
+              "type": "org.springy.springy_avro.example.loans.Address"
+            },
+            {
+              "name": "propertyType",
+              "type": {
+                "type": "enum",
+                "name": "PropertyType",
+                "symbols": [
+                  "SINGLE_FAMILY",
+                  "MULTI_FAMILY",
+                  "CONDO",
+                  "TOWNHOUSE",
+                  "OTHER"
+                ]
+              }
+            },
+            { "name": "purchasePrice", "type": "double" },
+            { "name": "downPayment",   "type": "double", "default": 0.0 },
+            {
+              "name": "occupancyType",
+              "type": {
+                "type": "enum",
+                "name": "OccupancyType",
+                "symbols": [
+                  "PRIMARY_RESIDENCE",
+                  "SECOND_HOME",
+                  "INVESTMENT"
+                ]
+              }
+            },
+            {
+              "name": "fixedRate",
+              "type": "boolean",
+              "default": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
